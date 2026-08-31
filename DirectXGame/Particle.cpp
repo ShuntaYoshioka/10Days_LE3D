@@ -1,86 +1,86 @@
 #include "Particle.h"
-#include <cstdlib> // std::rand 用
+#include "MyMath.h"
+#include <algorithm>
+#include <cstdlib>
 
-void Particle::Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera) {
+using namespace KamataEngine;
+
+// 範囲を指定して float の乱数を返す関数
+static float GetRandomFloat(float minVal, float maxVal) {
+	float rate = static_cast<float>(std::rand()) / RAND_MAX;
+	return minVal + rate * (maxVal - minVal);
+}
+
+void Particle::Initialize(Model* model, Camera* camera, const Vector3& position) {
 	model_ = model;
 	camera_ = camera;
-	particles_.clear();
-}
+	counter_ = 0.0f;
+	isFinished_ = false;
 
-// 指定した範囲 (min_val ～ max_val) の float 乱数を返すヘルパー関数
-static float GetRandomFloat(float min_val, float max_val) {
-	float rate = static_cast<float>(std::rand()) / RAND_MAX; // 0.0 ～ 1.0
-	return min_val + rate * (max_val - min_val);
-}
+	for (uint32_t i = 0; i < kNumParticles; ++i) {
+		worldTransforms_[i].Initialize();
+		worldTransforms_[i].translation_ = position;
 
-void Particle::SpawnExplosion(const KamataEngine::Vector3& position, int count) {
-	for (int i = 0; i < count; ++i) {
-		ParticleData p;
-		p.transform.Initialize();
-		p.transform.translation_ = position;
+		// 1. 乱数で散らばる方向と速度を決定 (X, Zは全方向、Yは少し上向きに跳ね上がる)
+		velocities_[i] = {
+		    GetRandomFloat(-0.2f, 0.2f), // X方向の広がり
+		    GetRandomFloat(0.05f, 0.3f),  // Y方向 (上への跳ね上がり)
+		    GetRandomFloat(-0.2f, 0.2f)  // Z方向の広がり
+		};
 
-		// rand() を使って全方向に散らばる速度ベクトルを生成
-		p.velocity = {
-		    GetRandomFloat(-0.3f, 0.3f), GetRandomFloat(0.0f, 0.4f), // 上方向に少し跳ね上がる
-		    GetRandomFloat(-0.3f, 0.3f)};
+		// 2. 乱数で回転速度を決定
+		rotSpeeds_[i] = {GetRandomFloat(-0.2f, 0.2f), GetRandomFloat(-0.2f, 0.2f), GetRandomFloat(-0.2f, 0.2f)};
 
-		// ランダムな初期サイズと寿命
-		float scale = GetRandomFloat(0.2f, 0.5f);
-		p.transform.scale_ = {scale, scale, scale};
-		p.maxLifeTime = GetRandomFloat(0.3f, 0.6f);
-		p.timer = 0.0f;
-		p.isDead = false;
-
-		particles_.push_back(p);
+		// 3. 乱数で初期サイズを決定
+		scale = GetRandomFloat(0.7f, 2.0f);
+		worldTransforms_[i].scale_ = {scale, scale, scale};
 	}
+
+	objectColor_.Initialize();
+	color_ = {1.0f, 1.0f, 1.0f, 1.0f};
 }
 
 void Particle::Update() {
-	// 1. 各パーティクルの移動・回転・拡大処理
-	for (ParticleData& p : particles_) {
-		if (p.isDead) {
-			continue;
-		}
-
-		p.timer += 1.0f / 60.0f;
-
-		// 寿命チェック
-		if (p.timer >= p.maxLifeTime) {
-			p.isDead = true;
-			continue;
-		}
-
-		// 位置の更新
-		p.transform.translation_.x += p.velocity.x;
-		p.transform.translation_.y += p.velocity.y;
-		p.transform.translation_.z += p.velocity.z;
-
-		// 回転処理
-		p.transform.rotation_.y = 3.14f;
-		p.transform.rotation_.z += 0.1f;
-
-		// 拡大処理（一気に広がる爆発感）
-		p.transform.scale_.x *= 1.05f;
-		p.transform.scale_.y *= 1.07f;
-		p.transform.scale_.z *= 1.05f;
-
-		// 行列更新
-		p.transform.matWorld_ = MakeAffineMatrix(p.transform.scale_, p.transform.rotation_, p.transform.translation_);
-		p.transform.TransferMatrix();
+	if (isFinished_) {
+		return;
 	}
 
-	// 2. 寿命が切れた（isDead == true）パーティクルをまとめて削除
-	particles_.remove_if([](const ParticleData& p) { return p.isDead; });
+	for (uint32_t i = 0; i < kNumParticles; ++i) {
+		// 移動処理
+		worldTransforms_[i].translation_.x += velocities_[i].x;
+		worldTransforms_[i].translation_.y += velocities_[i].y;
+		worldTransforms_[i].translation_.z += velocities_[i].z;
+
+		// 回転処理（成分ごとに加算）
+		worldTransforms_[i].rotation_.x += rotSpeeds_[i].x;
+		worldTransforms_[i].rotation_.y += rotSpeeds_[i].y;
+		worldTransforms_[i].rotation_.z += rotSpeeds_[i].z;
+		// 重力演出（少しずつ下に引っ張る）
+		velocities_[i].y -= 0.01f;
+
+		// 行列転送
+		worldTransforms_[i].matWorld_ = MakeAffineMatrix(worldTransforms_[i].scale_, worldTransforms_[i].rotation_, worldTransforms_[i].translation_);
+		worldTransforms_[i].TransferMatrix();
+	}
+
+	// アルファフェードアウト（時間経過で消えていく）
+	counter_ += 1.0f / 60.0f;
+	color_.w = std::clamp(1.0f - counter_ / kDuration, 0.0f, 1.0f);
+	objectColor_.SetColor(color_);
+
+	// 寿命到達で終了
+	if (counter_ >= kDuration) {
+		counter_ = kDuration;
+		isFinished_ = true;
+	}
 }
 
 void Particle::Draw() {
-	if (!model_ || !camera_)
+	if (isFinished_) {
 		return;
+	}
 
-	// イテレータを使わず、直接参照で描画
-	for (ParticleData& p : particles_) {
-		if (!p.isDead) {
-			model_->Draw(p.transform, *camera_);
-		}
+	for (WorldTransform& particleTransform : worldTransforms_) {
+		model_->Draw(particleTransform, *camera_, &objectColor_);
 	}
 }

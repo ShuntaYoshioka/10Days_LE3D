@@ -2,6 +2,7 @@
 #include "MyMath.h"
 #include "CameraController.h"
 
+
 using namespace KamataEngine;
 
 void GameScene::Initialize() {
@@ -16,8 +17,11 @@ void GameScene::Initialize() {
 	modelPlayer_ = Model::CreateFromOBJ("player", true);
 	modelEnemy_ = Model::CreateFromOBJ("enemy", true);
 	modelGoal_ = Model::CreateFromOBJ("goal", true);
-	modelAttack_ = Model::CreateFromOBJ("goal", true);
+	modelAttack_ = Model::CreateFromOBJ("playerAttack", true);
 	modelParticle_  = Model::CreateFromOBJ("deathParticle", true);
+
+	textureHandleGraph_ = TextureManager::Load("white1x1.png");
+
 	// マップチップフィールドの生成
 	mapChipField_ = new MapChipField;
 	// マップチップフィールドの初期化
@@ -47,9 +51,8 @@ void GameScene::Initialize() {
 	playerAttack_ = new PlayerAttack();
 	playerAttack_->Initialize(modelAttack_, &camera_, player_);
 
-	// パーティクルの初期化
-	particle_ = new Particle();
-	particle_->Initialize(modelParticle_, &camera_);
+	graphBar_ = new GraphBar();
+	graphBar_->Initialize(textureHandleGraph_);
 
 	// カメラの初期化
 	camera_.Initialize();
@@ -61,7 +64,7 @@ void GameScene::Initialize() {
 	cameraController_->SetTarget(player_);
 	cameraController_->SetMapChipField(mapChipField_);
 
-	// ゴールの初期化
+	// ゴールの初期化Q
 	Vector3 goalPosition = mapChipField_->GetMapChipPositionByIndex(18, 13); // マップ右端に置く例
 	Vector3 goalSize = {1.0f, 1.0f, 1.0f};
 	goal_.Initialize(goalPosition, goalSize, modelGoal_);
@@ -205,10 +208,27 @@ void GameScene::Update() {
 
 	playerAttack_->Update();
 
-	if (!wasExploding && playerAttack_->IsExploding() && particle_) {
-		particle_->SpawnExplosion(playerAttack_->GetWorldPosition(), 20);
+	graphBar_->Update(player_->GetFuel(), player_->GetMaxFuel());
+
+	if (!wasExploding && playerAttack_->IsExploding()) {
+		if (particle_) {
+			delete particle_;
+			particle_ = nullptr;
+		}
+
+		particle_ = new Particle();
+		particle_->Initialize(modelParticle_, &camera_, playerAttack_->GetWorldPosition());
 	}
 
+	// 更新処理 & 演出終了時の破棄
+	if (particle_) {
+		particle_->Update();
+
+		if (particle_->IsFinished()) {
+			delete particle_;
+			particle_ = nullptr;
+		}
+	}
 	if (particle_) {
 		particle_->Update();
 	}
@@ -284,13 +304,21 @@ void GameScene::Draw() {
 	}
 
    //アタック描画
-	if (playerAttack_->IsActive()) {
+	if (playerAttack_->IsActive() && !playerAttack_->IsExploding()) {
 		playerAttack_->Draw();
 	}
   
 	goal_.Draw(&camera_);
 
 	Model::PostDraw();
+
+	Sprite::PreDraw(dxCommon->GetCommandList());
+
+	if (graphBar_) {
+		graphBar_->Draw();
+	}
+
+	Sprite::PostDraw();
 
 	fade_->Draw();
 }
@@ -305,6 +333,7 @@ GameScene::~GameScene() {
 	delete mapChipField_;
 	delete particle_;
 	delete modelParticle_;
+	delete graphBar_;
 	for (std::vector<WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
 		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
 			delete worldTransformBlock;

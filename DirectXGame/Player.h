@@ -20,6 +20,8 @@ public:
 	const KamataEngine::WorldTransform& GetWorldTransform() const { return worldTransform_; }
 	KamataEngine::Vector3 GetWorldPosition() const { return worldTransform_.translation_; }
 
+	float GetMaxFuel() const { return kMaxFuel; }
+
 	const KamataEngine::Vector3& GetVelocity() const { return velocity_; }
 	void SetVelocity(const KamataEngine::Vector3& velocity) { velocity_ = velocity; }
 

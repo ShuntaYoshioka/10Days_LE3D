@@ -46,7 +46,7 @@ private:
 	//爆弾
 	bool isExploding_ = false;
 
-	static inline const float kFuseTime = 3.0f;      // 設置から爆発までの時間（秒）
+	static inline const float kFuseTime = 1.5f;      // 設置から爆発までの時間（秒）
 	static inline const float kExplodeTime = 0.4f;   // 爆発の持続時間（秒）
 	static inline const float kSize = 1.0f;          // 爆弾のサイズ
 	static inline const float kExplosionSize = 2.5f; // 爆発の判定サイズ
