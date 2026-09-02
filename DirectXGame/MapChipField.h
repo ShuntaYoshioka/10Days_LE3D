@@ -50,10 +50,6 @@ public:
 	static inline const float kBlockWidth = 1.0f;
 	static inline const float kBlockHeight = 1.0f;
 
-	//ペグ
-	static inline const float kPegWidth = 0.6f;
-	static inline const float kPegHeight = 0.6f; 
-
 	// ブロックの個数
 	static inline const uint32_t kNumBlockVirtical = 22;
 	static inline const uint32_t kNumBlockHorizontal = 19;

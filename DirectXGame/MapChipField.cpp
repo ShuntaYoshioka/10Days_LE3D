@@ -10,7 +10,6 @@ namespace {
 std::map<std::string, MapChipType> mapChipTable = {
     {"0", MapChipType::kBlank},
     {"1", MapChipType::kBlock},
-    {"2", MapChipType::kPeg  },
 };
 }
 
@@ -25,11 +24,11 @@ void MapChipField::ResetMapChipData() {
 }
 
 void MapChipField::LoadMapchipCsv(const std::string& filePath, uint32_t layer) {
-	assert(layer < kNumLayers);
+	//assert(layer < kNumLayers);
 
 	// ファイルを開く
 	std::ifstream file(filePath);
-	assert(file.is_open());
+	//assert(file.is_open());
 
 	std::stringstream mapChipCsv;
 	mapChipCsv << file.rdbuf();
@@ -87,13 +86,6 @@ MapChipField::Rect MapChipField::GetRectByIndex(uint32_t xIndex, uint32_t yIndex
 	float w = kBlockWidth;
 	float h = kBlockHeight;
 
-	for (uint32_t l = 0; l < kNumLayers; ++l) {
-		if (mapChipData_[l].data[yIndex][xIndex] == MapChipType::kPeg) {
-			w = kPegWidth;
-			h = kPegHeight; 
-			break;
-		}
-	}
 
 	Rect rect;
 	rect.left = center.x - w / 2.0f;

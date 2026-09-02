@@ -70,6 +70,10 @@ public:
 	Player* player_ = nullptr;
 
 	PlayerAttack* playerAttack_ = nullptr;
+
+	//敵
+	std::vector<Enemy*> enemies_;
+	
 	// sky
 	Skydome* skydome_ = nullptr;
 
@@ -97,6 +101,9 @@ public:
 	void CheckAllCollisions();
 
 	void ChangePhase();
+
+	float enemySpawnTimer_ = 0.0f;
+	static inline const float kSpawnInterval = 2.0f;//出現感覚
 
 	// ゲームプレイから開始
 	Phase phase_;

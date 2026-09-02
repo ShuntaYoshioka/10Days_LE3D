@@ -50,4 +50,8 @@ private:
 	static inline const float kExplodeTime = 0.4f;   // 爆発の持続時間（秒）
 	static inline const float kSize = 1.0f;          // 爆弾のサイズ
 	static inline const float kExplosionSize = 2.5f; // 爆発の判定サイズ
+
+	static inline const float kRequiredFuel = 20.0f; // 使う燃料の量
+	static inline const float kCoolTime = 1.0f;
+	float coolTimer_ = 0.0f;
 };

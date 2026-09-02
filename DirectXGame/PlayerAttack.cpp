@@ -14,9 +14,17 @@ void PlayerAttack::Initialize(KamataEngine::Model* model, KamataEngine::Camera* 
 
 void PlayerAttack::StartAttack() {
 
-	if (!player_ || isActive_) {
+	if (!player_ || isActive_ || coolTimer_ > 0.0f) {
 		return;
 	}
+
+	if(player_->GetFuel() < kRequiredFuel) {
+		return; // ガソリン不足なら設置不可
+	}
+
+	player_->RestoreFuel(-kRequiredFuel);
+
+	coolTimer_ = kCoolTime;
 
 	isActive_ = true;
 	isExploding_ = false;
@@ -30,6 +38,14 @@ void PlayerAttack::StartAttack() {
 }
 
 void PlayerAttack::Update() {
+
+	if (coolTimer_ > 0.0f) {
+		coolTimer_ -= 1.0f / 60.0f;
+		if (coolTimer_ < 0.0f) {
+			coolTimer_ = 0.0f;
+		}
+	}
+
 	if (!isActive_)
 		return;
 
@@ -70,7 +86,7 @@ AABB PlayerAttack::GetAABB() {
 		return AABB{
 		    {0, 0, 0},
             {0, 0, 0}
-        }; 
+        };
 	}
 
 	KamataEngine::Vector3 p = GetWorldPosition();
