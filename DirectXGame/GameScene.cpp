@@ -49,7 +49,7 @@ void GameScene::Initialize() {
 	cameraController_->SetTarget(player_);
 	cameraController_->SetMapChipField(mapChipField_);
 
-	Vector3 goalPosition = mapChipField_->GetMapChipPositionByIndex(18, 13);
+	Vector3 goalPosition = mapChipField_->GetMapChipPositionByIndex(18, 3);
 	Vector3 goalSize = {1.0f, 1.0f, 1.0f};
 	goal_.Initialize(goalPosition, goalSize, modelGoal_);
 
