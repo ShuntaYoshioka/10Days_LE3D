@@ -17,6 +17,8 @@ public:
 	void Update();
 	void Draw();
 
+	static Enemy* Create(KamataEngine::Model* model, KamataEngine::Camera* camera, Player* player, MapChipField* mapChipField);
+
 	// 追従対象のプレイヤーをセット
 	void SetPlayer(Player* player) { player_ = player; }
 	void SetMapChipField(MapChipField* mapChipField) { mapChipField_ = mapChipField; }
@@ -34,6 +36,9 @@ public:
 
 	// デスフラグ確認
 	bool isDead() const { return isDead_; }
+
+	//スポーン
+	static KamataEngine::Vector3 spawnPosition(const KamataEngine::Vector3& playerPos);
 
 	// 歩行スピード
 	static inline const float kWalkSpeed = 0.03f;

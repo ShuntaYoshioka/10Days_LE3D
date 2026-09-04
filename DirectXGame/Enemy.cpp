@@ -91,6 +91,31 @@ AABB Enemy::GetAABB() {
 	return aabb;
 }
 
+Enemy* Enemy::Create(KamataEngine::Model* model, KamataEngine::Camera* camera, Player* player, MapChipField* mapChipField) {
+	if (!player)
+		return nullptr;
+
+	//スポーン位置を計算
+	KamataEngine::Vector3 spawnPos = spawnPosition(player->GetWorldPosition());
+
+	Enemy* enemy = new Enemy();
+	enemy->Initialize(model, camera, spawnPos);
+	enemy->SetPlayer(player);
+	enemy->SetMapChipField(mapChipField);
+
+	return enemy;
+}
+
+KamataEngine::Vector3 Enemy::spawnPosition(const KamataEngine::Vector3& playerPos) {
+	// ランダムな角度 (0 〜 2π)
+	float angle = static_cast<float>(rand()) / RAND_MAX * 3.14159265f * 2.0f;
+	// プレイヤーからの距離 (12〜18ユニット)
+	float distance = 12.0f + static_cast<float>(rand()) / RAND_MAX * 6.0f;
+
+	// スポーン座標を計算 (XZ平面)
+	return {playerPos.x + std::cos(angle) * distance, 0.0f, playerPos.z + std::sin(angle) * distance};
+}
+
 void Enemy::Draw() {
 	if (!isDead_ && model_ && camera_) {
 		model_->Draw(worldTransform_, *camera_);

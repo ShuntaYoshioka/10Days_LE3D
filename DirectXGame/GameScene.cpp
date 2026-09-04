@@ -1,24 +1,23 @@
 #include "GameScene.h"
-#include "MyMath.h"
 #include "CameraController.h"
-
+#include "MyMath.h"
 
 using namespace KamataEngine;
 
 void GameScene::Initialize() {
 
 	phase_ = Phase::kFadeIn;
-	//ファイル名を指定してテクスチャを読み込む
+	// ファイル名を指定してテクスチャを読み込む
 	textureHandle_ = TextureManager::Load("./Resources./uvChecker.png");
 
-	//3Dモデルの生成
+	// 3Dモデルの生成
 	modelBlock_ = Model::CreateFromOBJ("block");
 	modelSkydome_ = Model::CreateFromOBJ("SkyDome", true);
 	modelPlayer_ = Model::CreateFromOBJ("player", true);
 	modelEnemy_ = Model::CreateFromOBJ("enemy", true);
 	modelGoal_ = Model::CreateFromOBJ("goal", true);
 	modelAttack_ = Model::CreateFromOBJ("playerAttack", true);
-	modelParticle_  = Model::CreateFromOBJ("deathParticle", true);
+	modelParticle_ = Model::CreateFromOBJ("deathParticle", true);
 
 	textureHandleGraph_ = TextureManager::Load("white1x1.png");
 
@@ -30,11 +29,10 @@ void GameScene::Initialize() {
 	mapChipField_->LoadMapchipCsv("Resources/blocks.csv", 0);
 	mapChipField_->LoadMapchipCsv("Resources/blocks2.csv", 1);
 
-
 	// 自キャラ生成
 	player_ = new Player();
 
-	//自キャラ座標をマップチップ番号で指定
+	// 自キャラ座標をマップチップ番号で指定
 	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(9, 10);
 
 	// ワールドトランスフォームの初期化
@@ -46,7 +44,6 @@ void GameScene::Initialize() {
 	skydome_ = new Skydome();
 
 	player_->SetMapChipField(mapChipField_);
-
 
 	playerAttack_ = new PlayerAttack();
 	playerAttack_->Initialize(modelAttack_, &camera_, player_);
@@ -68,11 +65,10 @@ void GameScene::Initialize() {
 	Vector3 goalPosition = mapChipField_->GetMapChipPositionByIndex(18, 13); // マップ右端に置く例
 	Vector3 goalSize = {1.0f, 1.0f, 1.0f};
 	goal_.Initialize(goalPosition, goalSize, modelGoal_);
-	//他の初期化
+	// 他の初期化
 	skydome_->Initialize(modelSkydome_, &camera_);
-	
-GenerateBlocks();
 
+	GenerateBlocks();
 
 	// カメラの生成
 	debugCamera_ = new DebugCamera(1280, 720);
@@ -118,52 +114,49 @@ void GameScene::CheckAllCollisions() {
 
 	aabb1 = player_->GetAABB();
 
-
 	if (IsCollision(aabb1, goal_.GetAABB())) {
 		finished_ = true;
 		isclear_ = true;
 	}
 
 #pragma endregion
-
 }
 
-void GameScene::ChangePhase() { 
-	switch (phase_) { 
+void GameScene::ChangePhase() {
+	switch (phase_) {
 	case Phase::kPlay:
 		/*ゲームプレイフェーズ処理
 		if (player_->isDead() == true){
-			phase_ = Phase::kDeath;
+		    phase_ = Phase::kDeath;
 
-			const Vector3& deathParticlesPosition = player_->GetWorldPosition();
-			deathParticles_ = new DeathParticles;
-			deathParticles_->Initialize(modelDeathParticle_, &camera_, deathParticlesPosition);
+		    const Vector3& deathParticlesPosition = player_->GetWorldPosition();
+		    deathParticles_ = new DeathParticles;
+		    deathParticles_->Initialize(modelDeathParticle_, &camera_, deathParticlesPosition);
 		} else if (isAllKill_) {
-			phase_ = Phase::kFadeOut;
-			fade_->Start(Fade::Status::FadeOut, 1.0f);
+		    phase_ = Phase::kFadeOut;
+		    fade_->Start(Fade::Status::FadeOut, 1.0f);
 		}
 		*/
 
 		break;
 	case Phase::kDeath:
 
-			phase_ = Phase::kFadeOut;
-			fade_->Start(Fade::Status::FadeOut, 1.0f);
-		
+		phase_ = Phase::kFadeOut;
+		fade_->Start(Fade::Status::FadeOut, 1.0f);
 
 		break;
-	
-		case Phase::kFadeIn:
+
+	case Phase::kFadeIn:
 		if (fade_->isFinished()) {
 			phase_ = Phase::kPlay;
 		}
 		break;
 
-		case Phase::kFadeOut:
-		    if (fade_->isFinished()) {
-			    finished_ = true;
-		    }
-		    break;
+	case Phase::kFadeOut:
+		if (fade_->isFinished()) {
+			finished_ = true;
+		}
+		break;
 	};
 }
 
@@ -173,9 +166,18 @@ void GameScene::Update() {
 
 	switch (phase_) {
 	case Phase::kPlay:
-		//goal_.Update();
+		// goal_.Update();
 
 		CheckAllCollisions();
+
+		enemySpawnTimer_ += 1.0f / 60.0f;
+		if (enemySpawnTimer_ >= kSpawnInterval) {
+			enemySpawnTimer_ = 0.0f;
+
+			if (Enemy* newEnemy = Enemy::Create(modelEnemy_, &camera_, player_, mapChipField_)) {
+				enemies_.push_back(newEnemy);
+			}
+		}
 
 		break;
 	case Phase::kDeath:
@@ -192,7 +194,7 @@ void GameScene::Update() {
 		break;
 	}
 
-	//共通の処理
+	// 共通の処理
 	if (phase_ != Phase::kFadeOut) {
 		player_->Update();
 	}
@@ -252,28 +254,28 @@ void GameScene::Update() {
 		}
 	}
 
-	#ifdef _DEBUG
+#ifdef _DEBUG
 	if (Input::GetInstance()->TriggerKey(DIK_0)) {
 		isDebugCameraActive_ = !isDebugCameraActive_;
 	}
 #endif
 
-	  ChangePhase();
+	ChangePhase();
 
-	  // カメラの処理
-	  if (isDebugCameraActive_) {
-		  debugCamera_->Update();
-		  camera_.matView = debugCamera_->GetCamera().matView;
-		  camera_.matProjection = debugCamera_->GetCamera().matProjection;
-		  // ビュープロジェクション行列の転送
-		  camera_.TransferMatrix();
-	  } else {
-		  camera_.matView = cameraController_->GetViewProjection().matView;
-		  camera_.matProjection = cameraController_->GetViewProjection().matProjection;
-		  // ビュープロジェクション行列の更新と転送
-		  camera_.TransferMatrix();
-		  // camera_.UpdateMatrix();
-	  }
+	// カメラの処理
+	if (isDebugCameraActive_) {
+		debugCamera_->Update();
+		camera_.matView = debugCamera_->GetCamera().matView;
+		camera_.matProjection = debugCamera_->GetCamera().matProjection;
+		// ビュープロジェクション行列の転送
+		camera_.TransferMatrix();
+	} else {
+		camera_.matView = cameraController_->GetViewProjection().matView;
+		camera_.matProjection = cameraController_->GetViewProjection().matProjection;
+		// ビュープロジェクション行列の更新と転送
+		camera_.TransferMatrix();
+		// camera_.UpdateMatrix();
+	}
 }
 
 void GameScene::Draw() {
@@ -281,7 +283,7 @@ void GameScene::Draw() {
 
 	Model::PreDraw(dxCommon->GetCommandList());
 
-	 if (skydome_) {
+	if (skydome_) {
 		skydome_->Draw();
 	}
 
@@ -303,11 +305,11 @@ void GameScene::Draw() {
 		particle_->Draw();
 	}
 
-   //アタック描画
+	// アタック描画
 	if (playerAttack_->IsActive() && !playerAttack_->IsExploding()) {
 		playerAttack_->Draw();
 	}
-  
+
 	goal_.Draw(&camera_);
 
 	Model::PostDraw();
@@ -329,7 +331,7 @@ GameScene::~GameScene() {
 	delete modelPlayer_;
 	delete modelEnemy_;
 	delete fade_;
-	delete modelSkydome_;  
+	delete modelSkydome_;
 	delete mapChipField_;
 	delete particle_;
 	delete modelParticle_;
