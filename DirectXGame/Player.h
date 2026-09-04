@@ -48,7 +48,7 @@ private:
 	// 物理計算パラメータ
 	KamataEngine::Vector3 velocity_ = {0.0f, 0.0f, 0.0f};
 
-	static inline const float kRadius = 0.5f; // 当たり判定の半径
+	static inline const float kRadius = 0.6f; // 当たり判定の半径
 	// 回転速度
 	float kSpinSpeed = 0.1f;
 	// 前進速度

@@ -31,7 +31,7 @@ void GameScene::Initialize() {
 
 	// 自キャラ生成
 	player_ = new Player();
-	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(9, 10);
+	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(3, 18);
 
 	worldTransform_.Initialize();
 	player_->Initialize(modelPlayer_, &camera_, playerPosition);
@@ -141,11 +141,21 @@ void GameScene::CheckAllCollisions() {
 					blockInterval_[i][j] = 30;
 
 					if (blockHp_[i][j] <= 0) {
+
+						Vector3 blockPos = worldTransformBlocks_[i][j]->translation_;
+
+						// 新しいパーティクルを生成＆初期化
+						particle_ = new Particle();
+						particle_->Initialize(modelParticle_, &camera_, blockPos);
+
 						delete worldTransformBlocks_[i][j];
 						worldTransformBlocks_[i][j] = nullptr;
+
+
 					}
 
 					playerAttack_->OnCollision();
+
 					if (!worldTransformBlocks_[i][j]) {
 						continue;
 					}

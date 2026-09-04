@@ -32,7 +32,7 @@ void Particle::Initialize(Model* model, Camera* camera, const Vector3& position)
 		rotSpeeds_[i] = {GetRandomFloat(-0.2f, 0.2f), GetRandomFloat(-0.2f, 0.2f), GetRandomFloat(-0.2f, 0.2f)};
 
 		// 3. 乱数で初期サイズを決定
-		scale = GetRandomFloat(0.7f, 2.0f);
+		scale = GetRandomFloat(0.5f, 1.6f);
 		worldTransforms_[i].scale_ = {scale, scale, scale};
 	}
 
