@@ -20,42 +20,45 @@ void Player::Initialize(Model* model, Camera* camera, const Vector3& position) {
 	worldTransform_.TransferMatrix();
 
 	velocity_ = {0.0f, 0.0f, 0.0f};
-	fuel_ = kMaxFuel;
 	isDead_ = false;
 }
 
 void Player::Update() {
 
-	if (isDead_)
+	if (isDead_) {
 		return;
-
-	if (fuel_ > 0.0f) {
-		fuel_ -= kFuelConsumption;
-		if (fuel_ <= 0.0f) {
-			fuel_ = 0.0f;
-		}
-
-		Input* input = Input::GetInstance();
-		if (input->PushKey(DIK_A) || input->PushKey(DIK_LEFT)) {
-			worldTransform_.rotation_.y -= kTurnSpeed;
-		}
-		if (input->PushKey(DIK_D) || input->PushKey(DIK_RIGHT)) {
-			worldTransform_.rotation_.y += kTurnSpeed;
-		}
-
-		velocity_.x = std::sin(worldTransform_.rotation_.y) * kForwardSpeed;
-		velocity_.z = std::cos(worldTransform_.rotation_.y) * kForwardSpeed;
-
-		worldTransform_.translation_.x += velocity_.x;
-		worldTransform_.translation_.z += velocity_.z;
-		worldTransform_.translation_.y = 1.0f; 
-
-		worldTransform_.translation_.x = (std::clamp)(worldTransform_.translation_.x, 1.0f, 17.0f);
-
-		worldTransform_.translation_.z = (std::clamp)(worldTransform_.translation_.z, 1.0f, 20.0f);
-	} else {
-		velocity_ = {0.0f, 0.0f, 0.0f};
 	}
+
+	positionPrev_ = worldTransform_.translation_;
+
+	worldTransform_.rotation_.y += kSpinSpeed;
+
+	// 2. 移動処理（WASD / 矢印キー）
+	Input* input = Input::GetInstance();
+	velocity_ = {0.0f, 0.0f, 0.0f};
+
+	if (input->PushKey(DIK_W) || input->PushKey(DIK_UP)) {
+		velocity_.z += kForwardSpeed;
+	}
+	if (input->PushKey(DIK_S) || input->PushKey(DIK_DOWN)) {
+		velocity_.z -= kForwardSpeed;
+	}
+	if (input->PushKey(DIK_A) || input->PushKey(DIK_LEFT)) {
+		velocity_.x -= kForwardSpeed;
+	}
+	if (input->PushKey(DIK_D) || input->PushKey(DIK_RIGHT)) {
+		velocity_.x += kForwardSpeed;
+	}
+
+	// 座標更新
+	worldTransform_.translation_.x += velocity_.x;
+	worldTransform_.translation_.z += velocity_.z;
+	worldTransform_.translation_.y = 1.0f;
+
+	// 移動範囲の制限
+	worldTransform_.translation_.x = (std::clamp)(worldTransform_.translation_.x, 1.0f, 17.0f);
+	worldTransform_.translation_.z = (std::clamp)(worldTransform_.translation_.z, 1.0f, 20.0f);
+
 	// 行列更新
 	worldTransform_.matWorld_ = MakeAffineMatrix(worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
 	worldTransform_.TransferMatrix();
@@ -68,8 +71,6 @@ void Player::Draw() {
 		}
 	}
 }
-
-
 
 KamataEngine::Vector3 Player::GetWorldPosition() { return worldTransform_.translation_; }
 
@@ -85,13 +86,12 @@ AABB Player::GetAABB() {
 	aabb.max.z = worldTransform_.translation_.z + kRadius;
 	return aabb;
 }
-void Player::RestoreFuel(float amount) {
-	fuel_ += amount;
-	if (fuel_ > kMaxFuel) {
-		fuel_ = kMaxFuel; // 最大値を超えないように制限
-	}
-}
 
-void Player::OnCollision(const Enemy* enemy) {
-	(void)enemy;
+void Player::OnCollision(const AABB) {
+	// 壁に当たったら、移動前の安全な位置に押し戻す
+	worldTransform_.translation_ = positionPrev_;
+
+	// 行列を再計算して位置を確定させる
+	worldTransform_.matWorld_ = MakeAffineMatrix(worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
+	worldTransform_.TransferMatrix();
 }

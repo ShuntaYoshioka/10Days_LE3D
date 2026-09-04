@@ -21,6 +21,4 @@ private:
 	uint32_t textureHandle_;
 
 	// ガソリンゲージ用
-	KamataEngine::Sprite* fuelBarBG_ = nullptr;
-	KamataEngine::Sprite* fuelBarCurrent_ = nullptr;
 };

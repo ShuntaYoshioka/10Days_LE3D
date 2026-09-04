@@ -54,7 +54,7 @@ void TitleScene::Draw() {
 
 	Model::PreDraw(dxCommon->GetCommandList());
 
-	model_->Draw(worldTransform_, camera_);
+	//model_->Draw(worldTransform_, camera_);
 
 	modelPlayer_->Draw(worldTransformPlayer_, camera_);
 

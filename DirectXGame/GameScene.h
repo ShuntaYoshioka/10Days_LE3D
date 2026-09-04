@@ -1,6 +1,5 @@
 #pragma once
 #include "CameraController.h"
-#include "Enemy.h"
 #include "Fade.h"
 #include "Goal.h"
 #include "KamataEngine.h"
@@ -50,8 +49,6 @@ public:
 
 	KamataEngine::Model* modelPlayer_ = nullptr;
 
-	KamataEngine::Model* modelEnemy_ = nullptr;
-
 	KamataEngine::Model* modelGoal_ = nullptr;
 
 	KamataEngine::Model* modelAttack_ = nullptr;
@@ -70,9 +67,6 @@ public:
 	Player* player_ = nullptr;
 
 	PlayerAttack* playerAttack_ = nullptr;
-
-	//敵
-	std::vector<Enemy*> enemies_;
 	
 	// sky
 	Skydome* skydome_ = nullptr;
@@ -93,7 +87,8 @@ public:
 
 	// デバッグカメラ
 	KamataEngine::DebugCamera* debugCamera_ = nullptr;
-
+	//地面
+	std::vector<std::vector<WorldTransform*>> worldTransformGrounds_;
 	std::vector<std::vector<KamataEngine::WorldTransform*>> worldTransformBlocks_;
 
 	void GenerateBlocks();
@@ -102,8 +97,12 @@ public:
 
 	void ChangePhase();
 
-	float enemySpawnTimer_ = 0.0f;
-	static inline const float kSpawnInterval = 2.0f;//出現感覚
+	//壊す壁について
+	std::vector<std::vector<int>> blockHp_;
+	std::vector<std::vector<int>> blockInterval_;
+
+	uint32_t numVertical_ = 0;
+	uint32_t numHorizontal_ = 0;
 
 	// ゲームプレイから開始
 	Phase phase_;

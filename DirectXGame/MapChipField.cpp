@@ -10,6 +10,7 @@ namespace {
 std::map<std::string, MapChipType> mapChipTable = {
     {"0", MapChipType::kBlank},
     {"1", MapChipType::kBlock},
+    {"2", MapChipType::kBreakableBlock},
 };
 }
 
@@ -93,4 +94,11 @@ MapChipField::Rect MapChipField::GetRectByIndex(uint32_t xIndex, uint32_t yIndex
 	rect.bottom = center.z - h / 2.0f;
 	rect.top = center.z + h / 2.0f;
 	return rect; 
+}
+
+void MapChipField::SetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex, uint32_t layer, MapChipType type) {
+	if (xIndex >= kNumBlockHorizontal || yIndex >= kNumBlockVirtical || layer >= kNumLayers) {
+		return;
+	}
+	mapChipData_[layer].data[yIndex][xIndex] = type;
 }

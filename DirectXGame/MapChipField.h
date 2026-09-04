@@ -4,7 +4,7 @@
 enum class MapChipType { 
 	kBlank,
 	kBlock,
-	klord,
+	kBreakableBlock,
 
 };
 
@@ -35,6 +35,8 @@ public:
 
 	void ResetMapChipData();
 	void LoadMapchipCsv(const std::string& filePath, uint32_t layer = 0);
+
+	void SetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex, uint32_t layer, MapChipType type);//置き換え
 
 	MapChipType GetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex, uint32_t layer = 0);
 	KamataEngine::Vector3 GetMapChipPositionByIndex(uint32_t xIndex, uint32_t yIndex);

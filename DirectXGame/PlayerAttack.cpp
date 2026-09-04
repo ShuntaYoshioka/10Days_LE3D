@@ -1,6 +1,9 @@
 #include "PlayerAttack.h"
 #include "Player.h"
+#include <cmath>
 #include <numbers>
+
+using namespace KamataEngine;
 
 void PlayerAttack::Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera, Player* player) {
 	model_ = model;
@@ -8,90 +11,58 @@ void PlayerAttack::Initialize(KamataEngine::Model* model, KamataEngine::Camera* 
 	player_ = player;
 
 	worldTransform_.Initialize();
-	isActive_ = false;
-	timer_ = 0.0f;
+	worldTransform_.scale_ = {kRadius, kRadius, kRadius};                                 
 }
 
-void PlayerAttack::StartAttack() {
-
-	if (!player_ || isActive_ || coolTimer_ > 0.0f) {
-		return;
-	}
-
-	if(player_->GetFuel() < kRequiredFuel) {
-		return; // ガソリン不足なら設置不可
-	}
-
-	player_->RestoreFuel(-kRequiredFuel);
-
-	coolTimer_ = kCoolTime;
-
-	isActive_ = true;
-	isExploding_ = false;
-	timer_ = 0.0f;
-
-	// 設置
-	KamataEngine::Vector3 p = player_->GetWorldPosition();
-	worldTransform_.translation_ = p;
-	worldTransform_.scale_ = {kSize, kSize, kSize};
-	worldTransform_.rotation_ = {0.0f, 0.0f, 0.0f};
-}
+void PlayerAttack::StartAttack() { isActive_ = true; }
 
 void PlayerAttack::Update() {
-
-	if (coolTimer_ > 0.0f) {
-		coolTimer_ -= 1.0f / 60.0f;
-		if (coolTimer_ < 0.0f) {
-			coolTimer_ = 0.0f;
-		}
-	}
-
-	if (!isActive_)
+	if (!isActive_ || !player_)
 		return;
 
-	timer_ += 1.0f / 60.0f;
-	if (!isExploding_) {
-		if (timer_ >= kFuseTime) {
-			// 時間経過で爆発状態に移行
-			isExploding_ = true;
-			timer_ = 0.0f;
-			// 爆発サイズに拡大
-			worldTransform_.scale_ = {kExplosionSize, kExplosionSize, kExplosionSize};
-		}
-	}
-	// 2. 爆発中：判定を発生させて消去
-	else {
-		if (timer_ >= kExplodeTime) {
-			isActive_ = false;
-			isExploding_ = false;
-		}
-	}
+	// プレイヤーの位置と回転情報を取得
+	Vector3 playerPos = player_->GetWorldPosition();
+	Vector3 playerRot = player_->GetWorldRotation(); 
 
+	Vector3 forward;
+	forward.x = std::sin(playerRot.y);
+	forward.y = 0.0f;
+	forward.z = std::cos(playerRot.y);
+
+	//攻撃の位置 
+	worldTransform_.translation_.x = playerPos.x + forward.x;
+	worldTransform_.translation_.y = playerPos.y;
+	worldTransform_.translation_.z = playerPos.z + forward.z;
+
+	//回転をプレイヤーに合わせる
+	worldTransform_.rotation_ = playerRot;
+
+	// 行列更新
 	worldTransform_.matWorld_ = MakeAffineMatrix(worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
-
 	worldTransform_.TransferMatrix();
 }
 
 void PlayerAttack::Draw() {
-	if (isActive_)
+	if (isActive_ && model_ && camera_) {
 		model_->Draw(worldTransform_, *camera_);
+	}
 }
 
-void PlayerAttack::OnCollision() { isActive_ = false; }
+void PlayerAttack::OnCollision() {
+	// 常に攻撃を出し続ける場合は削除、当たり判定時消すなら isActive_ = false;
+	isActive_ = false;
+}
 
-KamataEngine::Vector3 PlayerAttack::GetWorldPosition() { return {worldTransform_.matWorld_.m[3][0], worldTransform_.matWorld_.m[3][1], worldTransform_.matWorld_.m[3][2]}; }
+KamataEngine::Vector3 PlayerAttack::GetWorldPosition() { return worldTransform_.translation_; }
 
 AABB PlayerAttack::GetAABB() {
-	if (!isExploding_) {
-		return AABB{
-		    {0, 0, 0},
-            {0, 0, 0}
-        };
-	}
-
-	KamataEngine::Vector3 p = GetWorldPosition();
 	AABB aabb;
-	aabb.min = {p.x - kSize / 2.0f, p.y - kSize / 2.0f, p.z - kSize / 2.0f};
-	aabb.max = {p.x + kSize / 2.0f, p.y + kSize / 2.0f, p.z + kSize / 2.0f};
+	aabb.min.x = worldTransform_.translation_.x - kRadius;
+	aabb.min.y = worldTransform_.translation_.y - kRadius;
+	aabb.min.z = worldTransform_.translation_.z - kRadius;
+
+	aabb.max.x = worldTransform_.translation_.x + kRadius;
+	aabb.max.y = worldTransform_.translation_.y + kRadius;
+	aabb.max.z = worldTransform_.translation_.z + kRadius;
 	return aabb;
 }
