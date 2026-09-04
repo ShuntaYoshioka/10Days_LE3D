@@ -123,12 +123,12 @@ void GameScene::CheckAllCollisions() {
 
 	for (uint32_t i = 0; i < numVertical_; ++i) {
 		for (uint32_t j = 0; j < numHorizontal_; ++j) {
-			// ブロックが存在しない、または壊れている場合はスキップ
+			// ブロックが存在しないか壊れている場合はスキップ
 			if (!worldTransformBlocks_[i][j] || blockHp_[i][j] <= 0) {
 				continue;
 			}
 
-			// ブロックの AABB を作成
+			// ブロックのAABB
 			MapChipField::Rect rect = mapChipField_->GetRectByIndex(j, i);
 			AABB blockAABB;
 			blockAABB.min = {rect.left, -0.5f, rect.bottom};
@@ -146,7 +146,6 @@ void GameScene::CheckAllCollisions() {
 					}
 
 					playerAttack_->OnCollision();
-					// ブロックが破壊された場合はこれ以上判定しない
 					if (!worldTransformBlocks_[i][j]) {
 						continue;
 					}
@@ -154,10 +153,10 @@ void GameScene::CheckAllCollisions() {
 			}
 			// 壁とPlayerの当たり判定
 			if (worldTransformBlocks_[i][j] && IsCollision(playerAABB, blockAABB)) {
-				// Player 側に衝突イベント（押し戻しや停止などの処理）を通知する
+				// 衝突
 				player_->OnCollision(blockAABB);
 
-				// プレイヤーの座標が変わったため AABB を最新に更新
+				//AABB更新
 				playerAABB = player_->GetAABB();
 			}
 		}

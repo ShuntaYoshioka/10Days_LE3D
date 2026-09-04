@@ -17,7 +17,6 @@ public:
 	~TitleScene();
 
 	KamataEngine::Model* model_;
-	KamataEngine::Model* modelPlayer_;
 
 	KamataEngine::Camera camera_;
 

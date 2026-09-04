@@ -9,7 +9,6 @@
 #include "TitleScene.h"
 #include "PlayerAttack.h"
 #include "Particle.h"
-#include "GraphBar.h"
 #include <vector>
 
 class GameScene {
@@ -80,7 +79,6 @@ public:
 	// マップチップフィールド
 	MapChipField* mapChipField_;
 
-	GraphBar* graphBar_ = nullptr;
 
 	// デバッグカメラ有効
 	bool isDebugCameraActive_ = false;

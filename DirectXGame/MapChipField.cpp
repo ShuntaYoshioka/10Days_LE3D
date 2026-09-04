@@ -67,7 +67,7 @@ MapChipType MapChipField::GetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex
 
 KamataEngine::Vector3 MapChipField::GetMapChipPositionByIndex(uint32_t xIndex, uint32_t yIndex) {
 	float x = kBlockWidth * xIndex;
-	float y = 0.0f; // 床にするため高さはフラットに固定
+	float y = 0.0f; 
 	float z = kBlockHeight * (kNumBlockVirtical - 1 - yIndex);
 
 	return {x, y, z};
