@@ -151,6 +151,7 @@ void GameScene::CheckAllCollisions() {
 					}
 				}
 			}
+
 			// 壁とPlayerの当たり判定
 			if (worldTransformBlocks_[i][j] && IsCollision(playerAABB, blockAABB)) {
 				// 衝突
@@ -221,6 +222,9 @@ void GameScene::Update() {
 			}
 		}
 	}
+
+		goal_.Update();
+
 
 	skydome_->Update();
 	playerAttack_->StartAttack();
@@ -314,7 +318,8 @@ void GameScene::Draw() {
 		playerAttack_->Draw();
 	}
 
-	goal_.Draw(&camera_);
+		goal_.Draw(&camera_);
+	
 
 	Model::PostDraw();
 

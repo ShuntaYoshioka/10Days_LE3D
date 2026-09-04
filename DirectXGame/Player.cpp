@@ -33,7 +33,7 @@ void Player::Update() {
 
 	worldTransform_.rotation_.y += kSpinSpeed;
 
-	// 2. 移動処理（WASD / 矢印キー）
+	//移動処理
 	Input* input = Input::GetInstance();
 	velocity_ = {0.0f, 0.0f, 0.0f};
 
@@ -55,7 +55,7 @@ void Player::Update() {
 	worldTransform_.translation_.z += velocity_.z;
 	worldTransform_.translation_.y = 1.0f;
 
-	// 移動範囲の制限
+	//とりあえず手動で移動範囲の制限
 	worldTransform_.translation_.x = (std::clamp)(worldTransform_.translation_.x, 1.0f, 17.0f);
 	worldTransform_.translation_.z = (std::clamp)(worldTransform_.translation_.z, 1.0f, 20.0f);
 
@@ -88,10 +88,8 @@ AABB Player::GetAABB() {
 }
 
 void Player::OnCollision(const AABB) {
-	// 壁に当たったら、移動前の安全な位置に押し戻す
+	// 壁に当たったら押し戻す 改善する
 	worldTransform_.translation_ = positionPrev_;
 
-	// 行列を再計算して位置を確定させる
-	worldTransform_.matWorld_ = MakeAffineMatrix(worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
-	worldTransform_.TransferMatrix();
+
 }

@@ -66,7 +66,8 @@ public:
 	Player* player_ = nullptr;
 
 	PlayerAttack* playerAttack_ = nullptr;
-	
+
+
 	// sky
 	Skydome* skydome_ = nullptr;
 
