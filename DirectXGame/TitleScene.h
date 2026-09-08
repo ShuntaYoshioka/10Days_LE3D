@@ -32,4 +32,15 @@ private:
 	Fade* fade_ = nullptr;
 
 	Phase phase_ = Phase::kFadeIn;
+
+	uint32_t titleTextureHandle_ = 0;
+
+	KamataEngine::Sprite* titleSprite_ = nullptr;
+
+	uint32_t startTextureHandle_ = 0;
+
+	KamataEngine::Sprite* startSprite_ = nullptr;
+
+	// SPACE TO START点滅用カウンター
+	float startBlinkTimer_ = 0.0f;
 };

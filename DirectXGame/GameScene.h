@@ -9,6 +9,8 @@
 #include "TitleScene.h"
 #include "PlayerAttack.h"
 #include "Particle.h"
+#include "NumberDrawer.h"
+#include "RoomConnectivity.h"
 #include <vector>
 
 class GameScene {
@@ -107,6 +109,8 @@ public:
 
 	bool isFinished() const { return finished_; }
 
+	uint32_t GetOpenedConnectionCount() const { return roomConnectivity_.GetOpenedConnectionCount(); }
+
 	bool isclear_ = false;
 
 	 bool isAllKill_ = false;
@@ -114,4 +118,10 @@ public:
 	Fade* fade_ = nullptr;
 
 	bool wasExploding = false;
+
+	// 部屋の開通数(壁破壊によるスコア計算用)
+	RoomConnectivity roomConnectivity_;
+
+	// プレイ中のスコア表示
+	NumberDrawer scoreNumber_;
 };

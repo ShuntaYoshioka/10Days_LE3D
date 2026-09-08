@@ -29,6 +29,11 @@ void GameScene::Initialize() {
 	numVertical_ = mapChipField_->GetNumBlockVirtical();
 	numHorizontal_ = mapChipField_->GetNumBlockHorizontal();
 
+	roomConnectivity_.Initialize(mapChipField_, numHorizontal_, numVertical_);
+
+	scoreNumber_.Initialize({20.0f, 20.0f}, 32.0f);
+	scoreNumber_.SetValue(RoomConnectivity::ComputeScore(roomConnectivity_.GetOpenedConnectionCount()));
+
 	// 自キャラ生成
 	player_ = new Player();
 	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(3, 18);
@@ -151,7 +156,8 @@ void GameScene::CheckAllCollisions() {
 						delete worldTransformBlocks_[i][j];
 						worldTransformBlocks_[i][j] = nullptr;
 
-
+						roomConnectivity_.NotifyBlockBroken(j, i);
+						scoreNumber_.SetValue(RoomConnectivity::ComputeScore(roomConnectivity_.GetOpenedConnectionCount()));
 					}
 
 					playerAttack_->OnCollision();
@@ -334,6 +340,7 @@ void GameScene::Draw() {
 	Model::PostDraw();
 
 	Sprite::PreDraw(dxCommon->GetCommandList());
+	scoreNumber_.Draw();
 	Sprite::PostDraw();
 
 	fade_->Draw();

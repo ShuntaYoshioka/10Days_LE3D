@@ -107,6 +107,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CameraController.cpp" />
+    <ClCompile Include="ClearScene.cpp" />
     <ClCompile Include="DeathParticles.cpp" />
     <ClCompile Include="Fade.cpp" />
     <ClCompile Include="GameScene.cpp" />
@@ -114,11 +115,14 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MapChipField.cpp" />
     <ClCompile Include="MyMath.cpp" />
+    <ClCompile Include="NumberDrawer.cpp" />
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerAttack.cpp" />
+    <ClCompile Include="RoomConnectivity.cpp" />
     <ClCompile Include="Skydome.cpp" />
     <ClCompile Include="TitleScene.cpp" />
+    <ClCompile Include="TutorialScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\TerrainPS.hlsl">
@@ -197,17 +201,21 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CameraController.h" />
+    <ClInclude Include="ClearScene.h" />
     <ClInclude Include="DeathParticles.h" />
     <ClInclude Include="Fade.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="Goal.h" />
     <ClInclude Include="MapChipField.h" />
     <ClInclude Include="MyMath.h" />
+    <ClInclude Include="NumberDrawer.h" />
     <ClInclude Include="Particle.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerAttack.h" />
+    <ClInclude Include="RoomConnectivity.h" />
     <ClInclude Include="Skydome.h" />
     <ClInclude Include="TitleScene.h" />
+    <ClInclude Include="TutorialScene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
