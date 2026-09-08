@@ -7,7 +7,7 @@ using namespace KamataEngine;
 void GameScene::Initialize() {
 
 	phase_ = Phase::kFadeIn;
-	textureHandle_ = TextureManager::Load("./Resources./uvChecker.png");
+
 	// 3Dモデルの生成
 	modelBlock_ = Model::CreateFromOBJ("block");
 	modelWall_ = Model::CreateFromOBJ("kabe", true);
