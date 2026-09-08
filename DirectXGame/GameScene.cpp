@@ -156,8 +156,10 @@ void GameScene::CheckAllCollisions() {
 						delete worldTransformBlocks_[i][j];
 						worldTransformBlocks_[i][j] = nullptr;
 
-						roomConnectivity_.NotifyBlockBroken(j, i);
-						scoreNumber_.SetValue(RoomConnectivity::ComputeScore(roomConnectivity_.GetOpenedConnectionCount()));
+						if (roomConnectivity_.NotifyBlockBroken(j, i)) {
+							scoreNumber_.SetValue(RoomConnectivity::ComputeScore(roomConnectivity_.GetOpenedConnectionCount()));
+							scoreNumber_.Flash();
+						}
 					}
 
 					playerAttack_->OnCollision();
@@ -210,6 +212,8 @@ void GameScene::ChangePhase() {
 void GameScene::Update() {
 
 	fade_->Update();
+
+	scoreNumber_.Update();
 
 	switch (phase_) {
 	case Phase::kPlay:

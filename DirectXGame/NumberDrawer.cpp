@@ -44,6 +44,26 @@ void NumberDrawer::SetValue(uint32_t value) {
 	}
 }
 
+void NumberDrawer::Flash() { flashTimer_ = kFlashDuration; }
+
+void NumberDrawer::Update() {
+	if (flashTimer_ <= 0.0f) {
+		return;
+	}
+
+	flashTimer_ -= 1.0f / 60.0f;
+	if (flashTimer_ < 0.0f) {
+		flashTimer_ = 0.0f;
+	}
+
+	// 経過とともに赤(1,0,0)から白(1,1,1)へ戻す
+	float t = flashTimer_ / kFlashDuration;
+	Vector4 color = {1.0f, 1.0f - t, 1.0f - t, 1.0f};
+	for (uint32_t i = 0; i < kMaxDigits; ++i) {
+		digitSprites_[i]->SetColor(color);
+	}
+}
+
 void NumberDrawer::Draw() {
 	for (uint32_t i = 0; i < digitCount_; ++i) {
 		digitSprites_[i]->Draw();

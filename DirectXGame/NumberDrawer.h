@@ -13,6 +13,11 @@ public:
 
 	void SetValue(uint32_t value);
 
+	// 値が減った瞬間などに呼ぶと、一瞬赤くフラッシュしてから白へ戻る
+	void Flash();
+
+	void Update();
+
 	void Draw();
 
 	~NumberDrawer();
@@ -26,4 +31,7 @@ private:
 	KamataEngine::Vector2 position_{};
 	float digitSize_ = 32.0f;
 	uint32_t digitCount_ = 1;
+
+	static constexpr float kFlashDuration = 0.3f;
+	float flashTimer_ = 0.0f;
 };
