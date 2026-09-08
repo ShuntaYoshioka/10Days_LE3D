@@ -27,5 +27,9 @@ private:
 	KamataEngine::Camera* camera_ = nullptr;
 	Player* player_ = nullptr;
 	KamataEngine::WorldTransform worldTransform_;
+
+	KamataEngine::Vector3 playerPos;
+	KamataEngine::Vector3 playerRot;
+	KamataEngine::Vector3 forward;
 	bool isActive_ = false;
 };

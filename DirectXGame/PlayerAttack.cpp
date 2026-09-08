@@ -11,7 +11,7 @@ void PlayerAttack::Initialize(KamataEngine::Model* model, KamataEngine::Camera* 
 	player_ = player;
 
 	worldTransform_.Initialize();
-	worldTransform_.scale_ = {kRadius, kRadius, kRadius};                                 
+	worldTransform_.scale_ = {kRadius, kRadius, kRadius};
 }
 
 void PlayerAttack::StartAttack() { isActive_ = true; }
@@ -21,20 +21,19 @@ void PlayerAttack::Update() {
 		return;
 
 	// プレイヤーの位置と回転情報を取得
-	Vector3 playerPos = player_->GetWorldPosition();
-	Vector3 playerRot = player_->GetWorldRotation(); 
+	playerPos = player_->GetWorldPosition();
+	playerRot = player_->GetWorldRotation();
 
-	Vector3 forward;
 	forward.x = std::sin(playerRot.y);
 	forward.y = 0.0f;
 	forward.z = std::cos(playerRot.y);
 
-	//攻撃の位置 
+	// 攻撃の位置
 	worldTransform_.translation_.x = playerPos.x + forward.x;
 	worldTransform_.translation_.y = playerPos.y;
 	worldTransform_.translation_.z = playerPos.z + forward.z;
 
-	//回転をプレイヤーに合わせる
+	// 回転をプレイヤーに合わせる
 	worldTransform_.rotation_ = playerRot;
 
 	// 行列更新
