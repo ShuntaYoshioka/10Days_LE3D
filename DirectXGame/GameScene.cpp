@@ -7,10 +7,10 @@ using namespace KamataEngine;
 void GameScene::Initialize() {
 
 	phase_ = Phase::kFadeIn;
-	textureHandle_ = TextureManager::Load("./Resources./uvChecker.png");
 
 	// 3Dモデルの生成
 	modelBlock_ = Model::CreateFromOBJ("block");
+	modelWall_ = Model::CreateFromOBJ("kabe", true);
 	modelSkydome_ = Model::CreateFromOBJ("SkyDome", true);
 	modelPlayer_ = Model::CreateFromOBJ("P_rinker", true);
 	modelGoal_ = Model::CreateFromOBJ("goal", true);
@@ -36,7 +36,7 @@ void GameScene::Initialize() {
 
 	// 自キャラ生成
 	player_ = new Player();
-	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(3, 18);
+	playerPosition = mapChipField_->GetMapChipPositionByIndex(3, 18);
 
 	worldTransform_.Initialize();
 	player_->Initialize(modelPlayer_, &camera_, playerPosition);
@@ -54,7 +54,7 @@ void GameScene::Initialize() {
 	cameraController_->SetTarget(player_);
 	cameraController_->SetMapChipField(mapChipField_);
 
-	Vector3 goalPosition = mapChipField_->GetMapChipPositionByIndex(18, 3);
+	Vector3 goalPosition = mapChipField_->GetMapChipPositionByIndex(17, 3);
 	Vector3 goalSize = {1.0f, 1.0f, 1.0f};
 	goal_.Initialize(goalPosition, goalSize, modelGoal_);
 
@@ -318,7 +318,7 @@ void GameScene::Draw() {
 		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
 			if (!worldTransformBlock)
 				continue;
-			modelBlock_->Draw(*worldTransformBlock, camera_);
+			modelWall_->Draw(*worldTransformBlock, camera_);
 		}
 	}
 
@@ -348,6 +348,7 @@ void GameScene::Draw() {
 
 GameScene::~GameScene() {
 	delete modelBlock_;
+	delete modelWall_;
 	delete debugCamera_;
 	delete modelPlayer_;
 	delete fade_;

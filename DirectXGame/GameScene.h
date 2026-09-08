@@ -46,6 +46,8 @@ public:
 	// 3Dモデル
 	KamataEngine::Model* modelBlock_;
 
+	KamataEngine::Model* modelWall_ = nullptr;
+
 	KamataEngine::Model* modelSkydome_ = nullptr;
 
 	KamataEngine::Model* modelPlayer_ = nullptr;
@@ -100,6 +102,8 @@ public:
 	//壊す壁について
 	std::vector<std::vector<int>> blockHp_;
 	std::vector<std::vector<int>> blockInterval_;
+
+	KamataEngine::Vector3 playerPosition;
 
 	uint32_t numVertical_ = 0;
 	uint32_t numHorizontal_ = 0;
