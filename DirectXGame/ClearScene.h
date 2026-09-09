@@ -54,10 +54,25 @@ private:
 
 	KamataEngine::Sprite* stclearSprite_ = nullptr;
 
+	uint32_t scoreLabelTextureHandle_ = 0;
+
+	KamataEngine::Sprite* scoreLabelSprite_ = nullptr;
+
+	uint32_t openedLabelTextureHandle_ = 0;
+
+	KamataEngine::Sprite* openedLabelSprite_ = nullptr;
+
 	uint32_t endTextureHandle_ = 0;
 
 	KamataEngine::Sprite* endSprite_ = nullptr;
 
 	// SPACE TO TITLEの拡縮パルス用カウンター
 	float endPulseTimer_ = 0.0f;
+
+	// SE(決定音)
+	uint32_t seConfirmHandle_ = 0;
+
+	// BGM
+	uint32_t bgmHandle_ = 0;
+	uint32_t bgmVoiceHandle_ = 0;
 };

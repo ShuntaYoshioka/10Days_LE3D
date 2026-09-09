@@ -5,6 +5,8 @@ using namespace KamataEngine;
 
 TitleScene::~TitleScene() {
 
+	Audio::GetInstance()->StopWave(bgmVoiceHandle_);
+
 	delete startSprite_;
 	delete titleSprite_;
 	delete fade_;
@@ -32,6 +34,13 @@ void TitleScene::Initialize() {
 	fade_->Initialize();
 
 	fade_->Start(Fade::Status::FadeIn, 1.0f);
+
+	// SEの読み込み
+	seConfirmHandle_ = Audio::GetInstance()->LoadWave("SE/ketei.mp3");
+
+	// BGMの読み込み・再生(ループ)
+	bgmHandle_ = Audio::GetInstance()->LoadWave("BGM/title.mp3");
+	bgmVoiceHandle_ = Audio::GetInstance()->PlayWave(bgmHandle_, true, 0.5f);
 }
 
 void TitleScene::Update() {
@@ -45,8 +54,9 @@ void TitleScene::Update() {
 	switch (phase_) {
 	case Phase::kMain:
 		if (Input::GetInstance()->PushKey(DIK_SPACE)) {
+			Audio::GetInstance()->PlayWave(seConfirmHandle_);
 			phase_ = Phase::kFadeOut;
-			fade_->Start(Fade::Status::FadeOut, 1.0f); 
+			fade_->Start(Fade::Status::FadeOut, 1.0f);
 		}
 		break;
 	case Phase::kFadeIn:

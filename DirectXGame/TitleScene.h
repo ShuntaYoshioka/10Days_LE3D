@@ -43,4 +43,11 @@ private:
 
 	// SPACE TO START点滅用カウンター
 	float startBlinkTimer_ = 0.0f;
+
+	// SE(決定音)
+	uint32_t seConfirmHandle_ = 0;
+
+	// BGM
+	uint32_t bgmHandle_ = 0;
+	uint32_t bgmVoiceHandle_ = 0;
 };

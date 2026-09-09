@@ -31,4 +31,8 @@ private:
 	uint32_t tutorialTextureHandle_ = 0;
 
 	KamataEngine::Sprite* tutorialSprite_ = nullptr;
+
+	// BGM(タイトルと同じ曲を継続使用)
+	uint32_t bgmHandle_ = 0;
+	uint32_t bgmVoiceHandle_ = 0;
 };

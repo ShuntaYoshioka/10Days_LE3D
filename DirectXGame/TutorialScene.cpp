@@ -3,6 +3,8 @@
 using namespace KamataEngine;
 
 TutorialScene::~TutorialScene() {
+	Audio::GetInstance()->StopWave(bgmVoiceHandle_);
+
 	delete tutorialSprite_;
 	delete fade_;
 }
@@ -16,6 +18,10 @@ void TutorialScene::Initialize() {
 	fade_->Initialize();
 
 	fade_->Start(Fade::Status::FadeIn, 1.0f);
+
+	// BGMの読み込み・再生(ループ、タイトルと同じ曲)
+	bgmHandle_ = Audio::GetInstance()->LoadWave("BGM/title.mp3");
+	bgmVoiceHandle_ = Audio::GetInstance()->PlayWave(bgmHandle_, true, 0.5f);
 }
 
 void TutorialScene::Update() {

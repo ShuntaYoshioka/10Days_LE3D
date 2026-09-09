@@ -60,6 +60,14 @@ public:
 
 	uint32_t textureHandleGraph_ = 0;
 
+	// SE(攻撃ヒット音・ブロック破壊音)
+	uint32_t seHitHandle_ = 0;
+	uint32_t seBreakHandle_ = 0;
+
+	// BGM
+	uint32_t bgmHandle_ = 0;
+	uint32_t bgmVoiceHandle_ = 0;
+
 	// ワールドトランスフォーム
 	KamataEngine::WorldTransform worldTransform_;
 

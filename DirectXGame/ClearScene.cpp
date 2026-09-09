@@ -4,7 +4,11 @@
 using namespace KamataEngine;
 
 ClearScene::~ClearScene() {
+	Audio::GetInstance()->StopWave(bgmVoiceHandle_);
+
 	delete endSprite_;
+	delete openedLabelSprite_;
+	delete scoreLabelSprite_;
 	delete stclearSprite_;
 	delete panelSprite_;
 	delete fade_;
@@ -30,18 +34,33 @@ void ClearScene::Initialize(uint32_t openedConnectionCount) {
 	endSprite_->SetAnchorPoint({0.5f, 0.5f});
 	endSprite_->SetSize({683.0f, 48.0f});
 
-	// SCORE : (8文字) を1.5倍スケールで表示した幅の分だけ右にずらす
-	scoreNumber_.Initialize({578.0f, 320.0f}, 27.0f);
+	// SCORE ラベル画像(127x26を数字と同じ高さ27pxに合わせて拡大)し、右端の直後に数字を配置
+	scoreLabelTextureHandle_ = TextureManager::Load("panel/scoreM.png");
+	scoreLabelSprite_ = Sprite::Create(scoreLabelTextureHandle_, {373.0f, 290.0f});
+	scoreLabelSprite_->SetSize({132.0f, 27.0f});
+
+	scoreNumber_.Initialize({515.0f, 290.0f}, 27.0f);
 	scoreNumber_.SetValue(score_);
 
-	// OPENED CONNECTIONS : (21文字) を1.5倍スケールで表示した幅の分だけ右にずらす
-	openedNumber_.Initialize({754.0f, 350.0f}, 27.0f);
+	// OPENED CONNECTIONS ラベル画像(400x29を数字と同じ高さ27pxに合わせて拡大)し、右端の直後に数字を配置
+	openedLabelTextureHandle_ = TextureManager::Load("panel/openedM.png");
+	openedLabelSprite_ = Sprite::Create(openedLabelTextureHandle_, {373.0f, 390.0f});
+	openedLabelSprite_->SetSize({372.0f, 27.0f});
+
+	openedNumber_.Initialize({755.0f, 390.0f}, 27.0f);
 	openedNumber_.SetValue(openedConnectionCount_);
 
 	fade_ = new Fade();
 	fade_->Initialize();
 
 	fade_->Start(Fade::Status::FadeIn, 1.0f);
+
+	// SEの読み込み
+	seConfirmHandle_ = Audio::GetInstance()->LoadWave("SE/ketei.mp3");
+
+	// BGMの読み込み・再生(ループ)
+	bgmHandle_ = Audio::GetInstance()->LoadWave("BGM/clear.mp3");
+	bgmVoiceHandle_ = Audio::GetInstance()->PlayWave(bgmHandle_, true, 0.5f);
 }
 
 void ClearScene::Update() {
@@ -61,10 +80,12 @@ void ClearScene::Update() {
 		break;
 	case Phase::kMain:
 		if (Input::GetInstance()->PushKey(DIK_SPACE)) {
+			Audio::GetInstance()->PlayWave(seConfirmHandle_);
 			nextScene_ = NextScene::kTitle;
 			phase_ = Phase::kFadeOut;
 			fade_->Start(Fade::Status::FadeOut, 1.0f);
 		} else if (Input::GetInstance()->PushKey(DIK_RETURN)) {
+			Audio::GetInstance()->PlayWave(seConfirmHandle_);
 			nextScene_ = NextScene::kStageSelect;
 			phase_ = Phase::kFadeOut;
 			fade_->Start(Fade::Status::FadeOut, 1.0f);
@@ -83,21 +104,13 @@ void ClearScene::Draw() {
 
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
 
-	DebugText* debugText = DebugText::GetInstance();
-
-	debugText->SetScale(1.5f);
-	debugText->SetPos(470, 320);
-	debugText->Printf("SCORE : ");
-
-	debugText->SetPos(470, 350);
-	debugText->Printf("OPENED CONNECTIONS : ");
-
 	Sprite::PreDraw(dxCommon->GetCommandList());
 
 	panelSprite_->Draw();
 	stclearSprite_->Draw();
-	debugText->DrawAll();
+	scoreLabelSprite_->Draw();
 	scoreNumber_.Draw();
+	openedLabelSprite_->Draw();
 	openedNumber_.Draw();
 	endSprite_->Draw();
 

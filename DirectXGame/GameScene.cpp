@@ -19,6 +19,14 @@ void GameScene::Initialize() {
 
 	textureHandleGraph_ = TextureManager::Load("white1x1.png");
 
+	// SEの読み込み
+	seHitHandle_ = Audio::GetInstance()->LoadWave("SE/tataku3.mp3");
+	seBreakHandle_ = Audio::GetInstance()->LoadWave("SE/hakai.mp3");
+
+	// BGMの読み込み・再生(ループ)
+	bgmHandle_ = Audio::GetInstance()->LoadWave("BGM/game.mp3");
+	bgmVoiceHandle_ = Audio::GetInstance()->PlayWave(bgmHandle_, true, 0.5f);
+
 	// マップチップフィールドの生成
 	mapChipField_ = new MapChipField;
 	mapChipField_->ResetMapChipData();
@@ -144,6 +152,7 @@ void GameScene::CheckAllCollisions() {
 				if (blockInterval_[i][j] <= 0) {
 					blockHp_[i][j]--;
 					blockInterval_[i][j] = 30;
+					Audio::GetInstance()->PlayWave(seHitHandle_);
 
 					if (blockHp_[i][j] <= 0) {
 
@@ -155,6 +164,8 @@ void GameScene::CheckAllCollisions() {
 
 						delete worldTransformBlocks_[i][j];
 						worldTransformBlocks_[i][j] = nullptr;
+
+						Audio::GetInstance()->PlayWave(seBreakHandle_);
 
 						if (roomConnectivity_.NotifyBlockBroken(j, i)) {
 							scoreNumber_.SetValue(RoomConnectivity::ComputeScore(roomConnectivity_.GetOpenedConnectionCount()));
@@ -351,6 +362,8 @@ void GameScene::Draw() {
 }
 
 GameScene::~GameScene() {
+	Audio::GetInstance()->StopWave(bgmVoiceHandle_);
+
 	delete modelBlock_;
 	delete modelWall_;
 	delete debugCamera_;
