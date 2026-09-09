@@ -5,6 +5,7 @@ using namespace KamataEngine;
 
 ClearScene::~ClearScene() {
 	delete endSprite_;
+	delete stclearSprite_;
 	delete panelSprite_;
 	delete fade_;
 }
@@ -18,6 +19,10 @@ void ClearScene::Initialize(uint32_t openedConnectionCount) {
 	panelTextureHandle_ = TextureManager::Load("panel/score.png");
 	panelSprite_ = Sprite::Create(panelTextureHandle_, {0, 0});
 	panelSprite_->SetSize({1280.0f, 720.0f});
+
+	stclearTextureHandle_ = TextureManager::Load("panel/stclear.png");
+	stclearSprite_ = Sprite::Create(stclearTextureHandle_, {368.0f, 100.0f});
+	stclearSprite_->SetSize({550.0f, 92.0f});
 
 	// 拡縮パルスのため中心アンカーで配置(中心座標 = 元の矩形の中心)
 	endTextureHandle_ = TextureManager::Load("panel/end.png");
@@ -80,10 +85,6 @@ void ClearScene::Draw() {
 
 	DebugText* debugText = DebugText::GetInstance();
 
-	debugText->SetScale(3.0f);
-	debugText->SetPos(500, 250);
-	debugText->Printf("STAGE CLEAR");
-
 	debugText->SetScale(1.5f);
 	debugText->SetPos(470, 320);
 	debugText->Printf("SCORE : ");
@@ -94,6 +95,7 @@ void ClearScene::Draw() {
 	Sprite::PreDraw(dxCommon->GetCommandList());
 
 	panelSprite_->Draw();
+	stclearSprite_->Draw();
 	debugText->DrawAll();
 	scoreNumber_.Draw();
 	openedNumber_.Draw();

@@ -50,6 +50,10 @@ private:
 
 	KamataEngine::Sprite* panelSprite_ = nullptr;
 
+	uint32_t stclearTextureHandle_ = 0;
+
+	KamataEngine::Sprite* stclearSprite_ = nullptr;
+
 	uint32_t endTextureHandle_ = 0;
 
 	KamataEngine::Sprite* endSprite_ = nullptr;
